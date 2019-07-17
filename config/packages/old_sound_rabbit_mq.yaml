@@ -1,0 +1,29 @@
+old_sound_rabbit_mq:
+    connections:
+        default:
+            url: '%env(RABBITMQ_URL)%'
+#    producers:
+#        # use 'old_sound_rabbit_mq.task_producer' service to send data.
+#        task:
+#            connection:       default
+#            exchange_options: { name: 'task', type: direct }
+#    consumers:
+#        task:
+#            connection:       default
+#            exchange_options: { name: 'task', type: direct }
+#            queue_options:    { name: 'task'}
+#            callback:         App\Consumer\TaskConsumer
+    rpc_clients:
+        integer_store:
+            connection: default
+            unserializer: json_decode
+            lazy: true
+            direct_reply_to: false
+    rpc_servers:
+        default:
+            connection: default
+            callback: App\Service\RpcServer
+            qos_options: {prefetch_size: 0, prefetch_count: 1, global: false}
+            exchange_options: {name: info, type: topic}
+            queue_options: {name: info, durable: false, auto_delete: true}
+            serializer: json_encode
